@@ -7,7 +7,7 @@ Created on Thu May 12 09:56:12 2022
 
 # Reads data from incoming POST-requests
 # Checks authentification of user
-# Find the first 10 results in Google by given keyword
+# Finds the first 10 results in Google by given keyword
 # Startfunction main(request) will be called by endpoint POST-request handler
 
 import json
@@ -15,8 +15,6 @@ from tld import get_tld
 
 # Extracts username, password and keyword from body -> form-data from POST-request
 # Input: unmodified Post-request
-# Return: extracted username (read_username), password (read_username) and 
-# keyword (read_keyword)
 def read_Post_request(request): 
     read_username = request.form.get('username')
     read_password = request.form.get('password')
@@ -24,7 +22,7 @@ def read_Post_request(request):
     return read_username, read_password, read_keyword
 
 # Check authentification by comparing given username and password with 
-# fix username 'East' and password 'West'
+# fix username and password 
 def authentification(username, password):
     if username == 'East': 
         if password == 'West':
@@ -59,7 +57,7 @@ def google_results(keyword):
 # Checks authentification of user by method authentification(read_username,read_password)
 # Searchs keyword in Googl by method google_results(read_keyword)
 # Input: POST-request
-# Return: Search results jsonStr (JSON String) or 
+# Return: Search results in jsonStr (JSON String)  
 def main(request): 
     read_username, read_password, read_keyword = read_Post_request(request)
     if (not read_keyword):
