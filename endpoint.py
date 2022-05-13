@@ -7,11 +7,6 @@ Created on Fri May 13 10:33:43 2022
 
 # Creates an endpoint to handle GET- and POST-requests
 
-# For testing GET-request: starting this file and call http://127.0.0.1:5000 
-# For testing POST-request: starting this file and send a POST-request
-# according scheme: (url, data={'keyword': '', 'username': '', 'password': ''}) 
-# for example with "Postman" https://www.postman.com/downloads/
-
 import app_google_results
 from flask import Flask
 from flask import request
