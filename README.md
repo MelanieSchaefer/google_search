@@ -1,4 +1,4 @@
-# Google Search
+# Google Search App
 
 ## Short description: 
 - This app process's incoming **GET**- and **POST**-requests over an endpoint
