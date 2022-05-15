@@ -1,58 +1,56 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri May 13 10:33:43 2022
+Created on Thu May 12 09:56:12 2022
 @author: Melanie
 """
 
-# Creates an endpoint to handle GET- and POST-requests
-# Handles authorization
+# Reads data from incoming POST-requests
+# Finds the first 10 results in Google of a given keyword
+# Startfunction main(request) will be called by endpoint POST-request handler
 
-import app_google_results
-import jwt
-import datetime
-from flask import Flask, jsonify, request, make_response
-from flask import request
-from functools import wraps
+import json
+from tld import get_tld
 
-# Create a flask (web) application
-app = Flask(__name__)
+# Extracts keyword from body -> form-data from POST-request
+# Input: unmodified Post-request
+def read_Post_request(request): 
+    read_keyword = request.form.get('keyword')  
+    return read_keyword
 
-app.config['SECRET_KEY'] = 'secretkey'
 
-def token_required(f): 
-    @wraps(f)
-    def decorated(*args, **kwargs): 
-        token = request.args.get('Token') 
-        if not token:
-            return jsonify({'message': 'Token is missing!', 'request' : request}), 401
+# Searching for the first 10 google results of given keyword
+# Input: String keyword
+# Output: JSON Scheme: {'results': [{result_ID=1, url, tld}, ..., {result_ID=10, url, tld}]}
+    # result_ID: position from top (1) to buttom (10)
+    # url: google result website link
+    # tld: top level domain
+def google_results(keyword): 
+    try:
+        from googlesearch import search
+    except ImportError:
+        print("No module named 'google' found")
+
+    current_position = 1
+    object_list = []
+    for j in search(keyword, tld="co.in", num=10, stop=10, pause=2):
+        x = {'result_ID' : current_position, 'url' : j, 
+             'tld' : get_tld(j)}
+        object_list.append(x)
+        current_position = current_position + 1
         
-        try: 
-            jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-        except: 
-            return jsonify({'message': 'Token is invalid!'}), 401
-        return f(*args, **kwargs)
-    return decorated
+    outcome = {}
+    outcome.update({"results" : object_list})   
+    jsonStr = json.dumps(outcome)
+    return jsonStr 
 
-@app.route('/login')
-def login(): 
-    auth = request.authorization
-    
-    if auth and auth.password == 'password': 
-        token = jwt.encode({'user': auth.username}, app.config['SECRET_KEY'], algorithm='HS256')
-        return jsonify({'token': token})
-    return make_response('Could not verify!', 401, {'WWW-Authenticate': 'Basic realm=!Login required"'})
-
-# Process incoming GET- and POST-requests
-# IP: 127.0.0.1, Port: 5000  
-@app.route('/', methods=['GET', 'POST'])
-@token_required
-def request_handler():
-    if request.method == 'POST':
-        google_results = app_google_results.main(request)
-        return google_results 
-    elif request.method == 'GET': 
-        return jsonify({'message': 'Welcome! This was a GET-request'})
-
-
-if __name__ == '__main__':
-    app.run(debug=True, use_reloader=False)  
+# Reads data from Post-request by method read_Post_request(request)
+# Searchs keyword in Google by method google_results(read_keyword)
+# Input: POST-request
+# Return: Search results in jsonStr as a JSON string  
+def main(request): 
+    read_keyword = read_Post_request(request)
+    if (not read_keyword):
+        return "Data is missing"
+    else:  
+        jsonStr = google_results(read_keyword)
+        return jsonStr
