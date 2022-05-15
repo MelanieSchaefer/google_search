@@ -1,22 +1,25 @@
 # Google Search App
 
 ## Short description: 
-- This app process's incoming **GET**- and **POST**-requests over an endpoint
-- **GET**-requests will lead to a web application server
-- **POST**-requests will be 
-  - checked for authentification with a fix username and password  
-  - if authentification success's the first 10 Google results will be returned for a variable keyword extracted from the POST-request   
-  - As a result a **JSON** string will be returned as a list of result objects with its position, url and top domain level
+- This app returns the first 10 Google results based on a variable keyword (app_google_results.py)
+- Incoming requests (**GET** / **POST**) are processed via an endpoint (endpoint.py)
+
+## Function: 
+- First, via a login page (http://127.0.0.1:5000/login), a user name and the password "password" must be entered as a GET-Request according this scheme:  {'user': auth.username, 'password' : 'password'}
+- The issued token must then be sent back as a POST request with the variable keyword to the route  http://127.0.0.1:5000/
+  - The token is passed as a parameter according this scheme: {'Token': issued token}  
+  (e.g. http://127.0.0.1:5000/?Token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiTWVsYW5pZSJ9.2Qzbbyco8YiBn3tWejoodcIw0la44xzHqTOX1F_sD7U)
+  - The variable keyword as a form-data in the request body according this scheme: {'keyword' : 'keyword'}
+- After sending the POST request the token will be decoded with a secret key
+- If all ordered data are present and valid, the token is valid for exactly 2 minutes 
+  - For this purpose, after automatic control, the app will output the first 10 Google results as **JSON** string for the corresponding keyword  
+  - This **JSON** string will be returned as a list of result objects with its position, url and top domain level
 
 ### Testing: 
-- For testing **GET**-request: start endpoint.py and call http://127.0.0.1:5000/  
-- For testing **POST**-request: start endpoint.py, create and send a POST-request according scheme:   
-  - (http://127.0.0.1:5000/, data = {'keyword': '  ', 'username': '  ', 'password': '  '}) 
-  - variable keyword e.g. Botnet  
-  - username = East  
-  - password = West  
-  - **POST**-request create example: requests.post(url, data=payload) with payload = {"keyword": "Botnet", "username":"East", "password":"West"}  
-  - Sending **POST**-requests with **Postman** https://www.postman.com/downloads/  
+- Start endpoint.py and call http://127.0.0.1:5000/login
+- Enter any username and the password "password"
+- Then create a POST request with the result token as a parameter and your desired keyword as a form-data to http://127.0.0.1:5000/  
+ 
 
 ### JSON scheme and example:
   - Keyword: **Botnet**
